@@ -1,0 +1,272 @@
+body{
+    font-family: 'Segoe UI', Arial;
+    background:#f3f4f6;
+    color:#111827;
+    padding:20px;
+}
+
+/* TOPO */
+.topo{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.topo-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.logo{
+    height:70px;
+    width:auto;
+}
+
+h1{
+    color:#0f172a;
+    font-size:42px;
+    margin:0;
+}
+
+.data{
+    font-size:14px;
+    color:#6b7280;
+}
+
+/* CARDS */
+.cards{
+    display:flex;
+    gap:16px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:16px;
+    min-width:200px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    transition:0.2s;
+    border-top:5px solid #1e293b;
+}
+
+.card:hover{
+    transform:translateY(-3px);
+}
+
+.card h2{
+    font-size:16px;
+    margin-bottom:10px;
+    color:#374151;
+}
+
+.card span{
+    font-size:42px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+/* CORES KPI */
+.card:nth-child(1){ border-color:#3b82f6; }
+.card:nth-child(2){ border-color:#8b5cf6; }
+.card:nth-child(3){ border-color:#22c55e; }
+.card:nth-child(4){ border-color:#f59e0b; }
+.card:nth-child(5){ border-color:#ef4444; }
+.card:nth-child(6){ border-color:#06b6d4; }
+
+/* FILTROS */
+.filtros{
+    display:flex;
+    gap:12px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+.filtros input,
+.filtro-box button{
+    padding:10px 14px;
+    border-radius:10px;
+    border:1px solid #d1d5db;
+    background:white;
+    color:#111827;
+    font-size:14px;
+}
+
+.filtro-box{
+    position:relative;
+}
+
+.filtro-box button{
+    cursor:pointer;
+}
+
+.dropdown{
+    display:none;
+    position:absolute;
+    background:white;
+    border:1px solid #d1d5db;
+    border-radius:12px;
+    max-height:240px;
+    overflow:auto;
+    z-index:100;
+    padding:12px;
+    min-width:220px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+}
+
+.dropdown label{
+    display:block;
+    margin-bottom:8px;
+    cursor:pointer;
+    color:#374151;
+}
+
+/* BLOCO */
+.bloco{
+    background:white;
+    border-radius:18px;
+    padding:18px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.08);
+    margin-bottom:20px;
+}
+
+.bloco h2{
+    margin-bottom:15px;
+    color:#0f172a;
+}
+
+/* TABELA */
+.tabela-container{
+    max-height:600px;
+    overflow:auto;
+    border-radius:12px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:14px;
+}
+
+th{
+    background:#0f172a;
+    color:white;
+    position:sticky;
+    top:0;
+    padding:14px;
+    text-align:left;
+    font-weight:600;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid #e5e7eb;
+    color:#1f2937;
+}
+
+/* LINHAS */
+tr{
+    background:white;
+    transition:0.2s;
+}
+
+tr:hover{
+    background:#f9fafb;
+}
+
+/* STATUS */
+.critico{
+    background:#fef3c7 !important;
+}
+
+.prioridade{
+    background:#fee2e2 !important;
+}
+
+/* SCROLL */
+::-webkit-scrollbar{
+    width:8px;
+    height:8px;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#cbd5e1;
+    border-radius:10px;
+}
+
+/* CONTAINER CRÍTICO */
+.container-critico td{
+    background:#AED4F0 !important;
+    color:#7f1d1d;
+    font-weight:bold;
+}
+
+/* CONTAINER PRIORIDADE */
+.container-prioridade td{
+    background:#AED4F0 !important;
+    color:#7f1d1d;
+    font-weight:bold;
+}
+
+.status-ok{
+    color:#15803d;
+    font-weight:600;
+}
+
+.status-no{
+    color:#b91c1c;
+    font-weight:600;
+}
+
+.card.containerSemana{
+    border-color:#0ea5e9;
+}
+
+.btnApresentacao{
+    background:#0f172a;
+    color:white;
+    border:none;
+    padding:12px 18px;
+    border-radius:10px;
+    cursor:pointer;
+    margin-bottom:15px;
+    font-size:14px;
+}
+
+.modo-apresentacao .cards{
+    display:none;
+}
+
+.modo-apresentacao .filtros{
+    display:none;
+}
+
+.modo-apresentacao .bloco:first-of-type{
+    display:none;
+}
+
+.modo-apresentacao #tabelaContainers{
+    font-size:20px;
+}
+
+.modo-apresentacao #tabelaContainers td{
+    padding:20px;
+}
+
+.modo-apresentacao #tabelaContainers th{
+    padding:22px;
+    font-size:18px;
+}
+
+.modo-apresentacao .bloco{
+    width:100%;
+}
+
+.modo-apresentacao .tabela-container{
+    max-height:90vh;
+}
+
+
