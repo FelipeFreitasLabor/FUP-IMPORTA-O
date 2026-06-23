@@ -269,4 +269,18 @@ tr:hover{
     max-height:90vh;
 }
 
+.btnExportar{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.btnExportar:hover{
+    background:#15803d;
+}
+
 

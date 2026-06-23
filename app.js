@@ -427,5 +427,53 @@ function atualizarDataCarga(){
     document.getElementById("dataAtual").innerText = dataFormatada;
 }
 
+function exportarResumo(){
+
+    const tabela = document.getElementById("tabela");
+
+    let csv = [];
+
+    for(let i = 0; i < tabela.rows.length; i++){
+
+        let linha = [];
+
+        for(let j = 0; j < tabela.rows[i].cells.length; j++){
+
+            linha.push(
+                '"' +
+                tabela.rows[i].cells[j].innerText.replace(/"/g,'""')
+                + '"'
+            );
+
+        }
+
+        csv.push(linha.join(";"));
+    }
+
+    const csvString = csv.join("\n");
+
+const blob = new Blob(
+    ["\uFEFF" + csvString],
+    {
+        type: "text/csv;charset=utf-8;"
+    }
+);
+
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+
+    const data = new Date();
+
+    const nomeArquivo =
+        "Resumo_" +
+        data.toISOString().slice(0,10) +
+        ".csv";
+
+    link.download = nomeArquivo;
+
+    link.click();
+}
+
 
 
