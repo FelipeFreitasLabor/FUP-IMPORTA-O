@@ -1,172 +1,398 @@
-<div class="topo">
+<!DOCTYPE html>
 
-  <div class="topo-left">
-    <img src="logo.png" class="logo">
-    <h1>ENTRADAS PREVISTAS - IMPORTAÇÃO</h1>
-  </div>
+<html lang="pt-br">
 
-  <div class="data">
-    Atualizado: <span id="dataAtual"></span>
-  </div>
-
-</div>
 <head>
-  <meta charset="UTF-8">
-  <title>Painel Operacional</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Operacional</title>
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 
-  <!-- Parser CSV PROFISSIONAL -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
 </head>
 
 <body>
 
+<!-- TOPO -->
+
+<div class="topo">
+
+    <div class="topo-left">
+
+        <img src="logo.png" class="logo">
+
+        <div>
+
+            <h1>PAINEL OPERACIONAL DE ENTRADAS            <div class="data">
+                Atualizado:
+                <span id="dataAtual"></span>
+            </div>
+</h1>
+
+        </div>
+
+    </div>
+
+    <div class="abas">
+
+        <button
+            onclick="mostrarImportados()"
+            class="aba-btn">
+            📦 Importados
+        </button>
+
+        <button
+            onclick="mostrarNacionais()"
+            class="aba-btn">
+            🏭 Nacionais
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ================================= -->
+<!-- IMPORTADOS -->
+<!-- ================================= -->
+
+<div id="areaImportados">
+
+    <!-- KPI -->
+
+    <div class="cards">
+
+        <div class="card">
+            <h2>📦 Processos</h2>
+            <span id="kpiProcessos">0</span>
+        </div>
+
+        <div class="card sku">
+            <h2>💉 SKU</h2>
+            <span id="kpiSku">0</span>
+        </div>
+
+        <div class="card">
+            <h2>🟢 Estável</h2>
+            <span id="kpiEstavel">0</span>
+        </div>
+
+        <div class="card">
+            <h2>🟡 Críticos</h2>
+            <span id="kpiCriticos">0</span>
+        </div>
+
+        <div class="card">
+            <h2>🔴 Prioridade</h2>
+            <span id="kpiPrioridade">0</span>
+        </div>
+
+        <div class="card">
+            <h2>🏭 Fornecedores</h2>
+            <span id="kpiFornecedores">0</span>
+        </div>
+
+        <div class="card containerSemana">
+            <h2>🚢 Containers<br>Previstos</h2>
+            <span id="kpiContainersSemana">0</span>
+        </div>
+
+    </div>
+
+    <!-- FILTROS IMPORTADOS -->
+
+    <div class="filtros">
+
+        <input type="date" id="dataInicio">
+        <input type="date" id="dataFim">
+
+        <div class="filtro-box">
+            <button onclick="toggleFiltro('mesBox')">
+                Mês ▼
+            </button>
+            <div id="mesBox" class="dropdown"></div>
+        </div>
+
+        <div class="filtro-box">
+            <button onclick="toggleFiltro('statusBox')">
+                Status ▼
+            </button>
+            <div id="statusBox" class="dropdown"></div>
+        </div>
+
+        <div class="filtro-box">
+            <button onclick="toggleFiltro('fornecedorBox')">
+                Fornecedor ▼
+            </button>
+            <div id="fornecedorBox" class="dropdown"></div>
+        </div>
+
+        <div class="filtro-box">
+            <button onclick="toggleFiltro('urgenciaBox')">
+                Urgência ▼
+            </button>
+            <div id="urgenciaBox" class="dropdown"></div>
+        </div>
+
+        <div class="filtro-box">
+            <button onclick="toggleFiltro('semanaBox')">
+                Semana ▼
+            </button>
+            <div id="semanaBox" class="dropdown"></div>
+        </div>
+
+        <input
+            type="text"
+            id="filtroBusca"
+            placeholder="Buscar SKU ou Descrição">
+
+        <button onclick="limparFiltros()">
+            Limpar
+        </button>
+
+        <button
+            onclick="exportarResumo()"
+            class="btnExportar">
+            📥 Exportar Importado
+        </button>
+
+    </div>
+
+    <!-- TABELA PROCESSOS -->
+
+    <div class="bloco">
+
+        <h2>📋 Processos</h2>
+
+        <div class="tabela-container">
+
+            <table id="tabela">
+
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Quantidade</th>
+                        <th>Urgência</th>
+                        <th>Fornecedor</th>
+                        <th>Chegada CD</th>
+                        <th>Atracação</th>
+                        <th>Semana</th>
+                        <th>PO</th>
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <!-- MODO APRESENTAÇÃO -->
+
+    <button
+        onclick="modoApresentacao()"
+        class="btnApresentacao">
+
+        🖥️ Modo Apresentação
+
+    </button>
+
+    <!-- TABELA CONTAINERS -->
+
+    <div class="bloco">
+
+        <h2>🚢 Containers</h2>
+
+        <div class="tabela-container">
+
+            <table id="tabelaContainers">
+
+                <thead>
+                    <tr>
+
+                        <th>Status</th>
+                        <th>Embarque</th>
+                        <th>Container</th>
+                        <th>Consolidado</th>
+                        <th>Entrega CD</th>
+                        <th>Nota Mãe</th>
+                        <th>Chegada CD</th>
+                        <th>Nota Complementar</th>
+                        <th>Descarregamento</th>
+                        <th>Disponível Venda</th>
+                        <th>Vto Armazém</th>
+                        <th>Desp Armazém</th>
+
+                    </tr>
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================================= -->
+<!-- NACIONAIS -->
+<!-- ================================= -->
+
+<div id="areaNacionais" style="display:none;">
+
+    <!-- KPI -->
+
 <div class="cards">
 
-  <div class="card">
-    <h2>📦 Processos</h2>
-    <span id="kpiProcessos">0</span>
-  </div>
+    <div class="card sku">
+        <h2>💉 SKU Nacional</h2>
+        <span id="kpiSkuNacional">0</span>
+    </div>
 
-  <div class="card sku">
-<h2>💉SKU</h2>
-<span id="kpiSku">0</span>
-</div>
+    <div class="card">
+        <h2>🏭 Fornecedores</h2>
+        <span id="kpiFornecedorNacional">0</span>
+    </div>
 
-  <div class="card">
-    <h2>🟢 Estável </h2>
-    <span id="kpiEstavel">0</span>
-  </div>
+    <div class="card">
+        <h2>🟢 Estável</h2>
+        <span id="kpiEstavelNacional">0</span>
+    </div>
 
-  <div class="card">
-    <h2>🟡 Críticos</h2>
-    <span id="kpiCriticos">0</span>
-  </div>
+    <div class="card">
+        <h2>🟡 Críticos</h2>
+        <span id="kpiCriticoNacional">0</span>
+    </div>
 
-  <div class="card">
-    <h2>🔴 Prioridade</h2>
-    <span id="kpiPrioridade">0</span>
-  </div>
-
-  <div class="card">
-    <h2>🏭 Fornecedores</h2>
-    <span id="kpiFornecedores">0</span>
-  </div>
-
+    <div class="card">
+        <h2>🔴 Prioridade</h2>
+        <span id="kpiPrioridadeNacional">0</span>
+    </div>
 
 </div>
+    <!-- FILTROS NACIONAIS -->
 
-<div class="filtros">
+    <div class="filtros">
 
-<input type="date" id="dataInicio">
-<input type="date" id="dataFim">
+<input type="date" id="dataInicioNacional">
+<input type="date" id="dataFimNacional">
 
 <div class="filtro-box">
-    <button onclick="toggleFiltro('mesBox')">Mês ▼</button>
-    <div id="mesBox" class="dropdown"></div>
+
+    <button onclick="toggleFiltro('urgenciaNacionalBox')">
+        Urgência ▼
+    </button>
+
+    <div
+        id="urgenciaNacionalBox"
+        class="dropdown">
+    </div>
+
 </div>
 
-  <div class="filtro-box">
-    <button onclick="toggleFiltro('statusBox')">Status ▼</button>
-    <div id="statusBox" class="dropdown"></div>
-  </div>
+        <div class="filtro-box">
 
-  <div class="filtro-box">
-    <button onclick="toggleFiltro('fornecedorBox')">Fornecedor ▼</button>
-    <div id="fornecedorBox" class="dropdown"></div>
-  </div>
+            <button
+                onclick="toggleFiltro('fornecedorNacionalBox')">
 
-  <div class="filtro-box">
-    <button onclick="toggleFiltro('urgenciaBox')">Urgência ▼</button>
-    <div id="urgenciaBox" class="dropdown"></div>
-  </div>
+                Fornecedor ▼
 
-  <div class="filtro-box">
-    <button onclick="toggleFiltro('semanaBox')">Semana ▼</button>
-    <div id="semanaBox" class="dropdown"></div>
-  </div>
+            </button>
 
-  <input type="text" id="filtroBusca" placeholder="Buscar">
+            <div
+                id="fornecedorNacionalBox"
+                class="dropdown">
 
-  <button onclick="limparFiltros()">Limpar</button>
+            </div>
 
-<button onclick="exportarResumo()" class="btnExportar">
-    📥 Exportar Resumo
+        </div>
+
+        <div class="filtro-box">
+
+            <button
+                onclick="toggleFiltro('familiaNacionalBox')">
+
+                Família ▼
+
+            </button>
+
+            <div
+                id="familiaNacionalBox"
+                class="dropdown">
+
+            </div>
+
+        </div>
+
+        <input
+            type="text"
+            id="buscaNacional"
+            placeholder="Buscar Código ou Descrição">
+
+<button onclick="limparFiltrosNacionais()">
+    Limpar
 </button>
 
-
-</div>
-
-  <!-- TABELA RESUMO -->
-  <div class="bloco">
-    <h2>📋 Processos</h2>
-
-    <div class="tabela-container">
-      <table id="tabela">
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Código</th>
-            <th>Descrição</th>
-            <th>Quantidade</th>
-            <th>Urgência</th>
-            <th>Fornecedor</th>
-            <th>Chegada CD</th>
-            <th>Atracação</th>
-            <th>Semana</th>
-	    <th>PO</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </div>
-  </div>
-
-<button onclick="modoApresentacao()" class="btnApresentacao">
-    🖥️ Modo Apresentação
+<button onclick="exportarNacional()" class="btnExportar">
+    📥 Exportar Nacional
 </button>
 
-<div class="card containerSemana">
-    <h2>🚢 Qtd Containers <br> Previsto</h2>
-    <span id="kpiContainersSemana">0</span>
-</div>
-
-
-  <!-- TABELA CONTAINER -->
-  <div class="bloco">
-    <h2>🚢 Containers</h2>
-
-    <div class="tabela-container">
-      <table id="tabelaContainers">
-        <thead>
-          <tr>
-            <th>Status</th>
-            <th>Embarque</th>
-            <th>Container</th>
-            <th>Consolidado</th>
-            <th>Entrega CD</th>
-            <th>Nota Mãe</th>
-
-            <th>Chegada CD</th>
-            <th>Nota Complementar</th>
-            <th>Descarregamento</th>
-            <th>Disponível Venda</th>
-            <th>Vto Armazém</th>
-            <th>Desp Armazém</th>
-
-
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
     </div>
-  </div>
+
+
+
+
+    <!-- TABELA NACIONAL -->
+
+    <div class="bloco">
+
+        <h2>🏭 Itens Nacionais</h2>
+
+        <div class="tabela-container">
+
+            <table id="tabelaNacional">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Fornecedor</th>
+                        <th>Código</th>
+                        <th>Descrição</th>
+                        <th>Família</th>
+                        <th>Urgência</th>
+                        <th>Quantidade</th>
+                        <th>Prev. Chegada CD</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody></tbody>
+
+            </table>
+
+        </div>
+
+    </div>
 
 </div>
 
 <script src="app.js"></script>
 
 </body>
+
+
+
 </html>
+
+
+
 

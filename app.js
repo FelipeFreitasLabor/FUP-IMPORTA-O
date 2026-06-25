@@ -2,6 +2,7 @@ console.log("JS carregado");
 
 // ================= BASE =================
 let dadosProcessos = [];
+let dadosNacionais = [];
 let mapaUrgencia = {};
 let embarquesSemana = new Set();
 let modoApresentacaoAtivo = false;
@@ -228,22 +229,117 @@ document.getElementById("dataFim").addEventListener("change", aplicarFiltros);
 
 // ================= MULTISELECT =================
 
+
 function criarCheckboxes(containerId, valores){
 
     const box = document.getElementById(containerId);
-    box.innerHTML = "";
 
-    valores.forEach(v => {
+    box.innerHTML = `
 
-        const label = document.createElement("label");
+        <input
+            type="text"
+            class="pesquisaFiltro"
+            placeholder="🔍 Pesquisar..."
+            onkeyup="filtrarCheckbox('${containerId}',this.value)">
 
-        label.innerHTML = `
-            <input type="checkbox" value="${v}" checked> ${v}
+        <div class="acoesFiltro">
+
+            <button
+                type="button"
+                onclick="selecionarTodos('${containerId}')">
+
+                Todos
+
+            </button>
+
+            <button
+                type="button"
+                onclick="limparSelecao('${containerId}')">
+
+                Limpar
+
+            </button>
+
+        </div>
+
+        <hr>
+
+    `;
+
+    valores.sort().forEach(v=>{
+
+        if(v=="") return;
+
+        const label=document.createElement("label");
+
+        label.innerHTML=`
+            <input
+                type="checkbox"
+                value="${v}"
+                checked>
+
+            ${v}
         `;
 
         box.appendChild(label);
+
     });
+
 }
+
+
+function filtrarCheckbox(containerId,texto){
+
+    texto = texto.toLowerCase();
+
+    const labels =
+        document.querySelectorAll(
+            "#" + containerId + " label"
+        );
+
+    labels.forEach(label=>{
+
+        const nome =
+            label.innerText.toLowerCase();
+
+        label.style.display =
+            nome.includes(texto)
+            ? ""
+            : "none";
+
+    });
+
+}
+
+function selecionarTodos(containerId){
+
+    document
+        .querySelectorAll(
+            "#" + containerId + " input[type=checkbox]"
+        )
+        .forEach(c=>c.checked=true);
+
+    aplicarFiltros();
+    aplicarFiltrosNacionais();
+
+}
+
+
+function limparSelecao(containerId){
+
+    document
+        .querySelectorAll(
+            "#" + containerId + " input[type=checkbox]"
+        )
+        .forEach(c=>c.checked=false);
+
+    aplicarFiltros();
+    aplicarFiltrosNacionais();
+
+}
+
+
+
 
 function getSelecionados(containerId){
 
@@ -280,15 +376,26 @@ function popularFiltros(){
 // ================= EVENTOS =================
 
 document.addEventListener("change", function(e){
+
     if(e.target.type === "checkbox"){
+
         aplicarFiltros();
+        aplicarFiltrosNacionais();
+
     }
+
 });
 
 document.addEventListener("input", function(e){
+
     if(e.target.id === "filtroBusca"){
         aplicarFiltros();
     }
+
+    if(e.target.id === "buscaNacional"){
+        aplicarFiltrosNacionais();
+    }
+
 });
 
 
@@ -309,6 +416,267 @@ function limparFiltros(){
     // Reaplicar filtros (mostra tudo)
     aplicarFiltros();
 }
+
+
+// ================= NACIONAL =================
+
+Papa.parse("resumo_nacional.csv", {
+
+    download: true,
+    header: true,
+    skipEmptyLines: true,
+
+complete: function(results){
+
+    console.log(results.data[0]);
+
+    dadosNacionais = results.data;
+
+    popularFiltrosNacionais();
+    aplicarFiltrosNacionais();
+
+}
+
+});
+
+// ================= FILTROS NACIONAIS =================
+
+function popularFiltrosNacionais(){
+
+    const fornecedorSet = new Set();
+    const familiaSet = new Set();
+const urgenciaSet = new Set();
+
+    dadosNacionais.forEach(item => {
+
+        fornecedorSet.add(item["FORNECEDOR"] || "");
+        familiaSet.add(item["FAMÍLIA"] || "");
+urgenciaSet.add(item["URGÊNCIA"] || "");
+
+    });
+
+criarCheckboxes(
+    "urgenciaNacionalBox",
+    [...urgenciaSet].filter(x => x)
+);
+
+    criarCheckboxes(
+        "fornecedorNacionalBox",
+        [...fornecedorSet].filter(x => x)
+    );
+
+    criarCheckboxes(
+        "familiaNacionalBox",
+        [...familiaSet].filter(x => x)
+    );
+}
+
+
+
+function aplicarFiltrosNacionais(){
+
+    const fornecedorSel = getSelecionados("fornecedorNacionalBox");
+    const familiaSel = getSelecionados("familiaNacionalBox");
+    const urgenciaSel = getSelecionados("urgenciaNacionalBox");
+
+    const busca = document.getElementById("buscaNacional").value.toLowerCase();
+
+    const dataInicio = document.getElementById("dataInicioNacional").value;
+    const dataFim = document.getElementById("dataFimNacional").value;
+
+    const dataInicioObj = dataInicio ? new Date(dataInicio) : null;
+    const dataFimObj = dataFim ? new Date(dataFim) : null;
+
+    const tbody = document.querySelector("#tabelaNacional tbody");
+    tbody.innerHTML = "";
+
+    const skuSet = new Set();
+    const fornecedorSet = new Set();
+
+
+
+// KPIs por SKU
+
+const skuEstavel = new Set();
+const skuCritico = new Set();
+const skuPrioridade = new Set();
+
+
+
+
+    dadosNacionais.forEach(linha => {
+
+        const fornecedor = linha["FORNECEDOR"] || "";
+
+const codigo =
+
+    linha["CÓDIGO ITEM"] ||
+
+    linha["C DIGO ITEM"] ||
+
+    linha["C DIGO ITEM"] ||
+
+    "";
+
+        const descricao =
+            linha["DESCRIÇÃO"] ||
+            linha["DESCRI  O"] ||
+            "";
+
+        const familia =
+            linha["FAMÍLIA"] ||
+            linha["FAM LIA"] ||
+            "";
+
+        const urgencia =
+            linha["URGÊNCIA"] ||
+            "";
+
+        const data =
+            linha["PREV. CHEGADA CD"] || "";
+
+        const dataLinha = converterDataBR(data);
+
+        // Data
+
+        if(dataInicioObj && dataLinha && dataLinha < dataInicioObj)
+            return;
+
+        if(dataFimObj && dataLinha && dataLinha > dataFimObj)
+            return;
+
+        // Fornecedor
+
+        if(
+            fornecedorSel.length &&
+            !fornecedorSel.includes(fornecedor)
+        ) return;
+
+        // Família
+
+        if(
+            familiaSel.length &&
+            !familiaSel.includes(familia)
+        ) return;
+
+        // Urgência
+
+        if(
+            urgenciaSel.length &&
+            !urgenciaSel.includes(urgencia)
+        ) return;
+
+        // Busca
+
+        if(
+            busca &&
+            !codigo.toLowerCase().includes(busca) &&
+            !descricao.toLowerCase().includes(busca)
+        ) return;
+
+        skuSet.add(codigo);
+        fornecedorSet.add(fornecedor);
+
+
+if(urgencia.includes("ESTÁVEL")){
+
+    skuEstavel.add(codigo);
+
+}
+
+if(urgencia.includes("CRÍTICO")){
+
+    skuCritico.add(codigo);
+
+}
+
+if(urgencia.includes("PRIORIDADE")){
+
+    skuPrioridade.add(codigo);
+
+}
+
+
+
+
+
+        const tr = document.createElement("tr");
+
+        if(urgencia.includes("CRÍTICO"))
+            tr.classList.add("critico");
+
+        if(urgencia.includes("PRIORIDADE"))
+            tr.classList.add("prioridade");
+
+        tr.innerHTML = `
+            <td>${fornecedor}</td>
+            <td>${codigo}</td>
+            <td>${descricao}</td>
+            <td>${familia}</td>
+            <td>${urgencia}</td>
+            <td>${linha["QUANTIDADE"] || ""}</td>
+            <td>${data}</td>
+        `;
+
+        tbody.appendChild(tr);
+
+    });
+
+    document.getElementById("kpiSkuNacional").innerText =
+        skuSet.size;
+
+    document.getElementById("kpiFornecedorNacional").innerText =
+        fornecedorSet.size;
+
+document.getElementById("kpiEstavelNacional").innerText =
+    skuEstavel.size;
+
+document.getElementById("kpiCriticoNacional").innerText =
+    skuCritico.size;
+
+document.getElementById("kpiPrioridadeNacional").innerText =
+    skuPrioridade.size;
+
+}
+
+document.getElementById("dataInicioNacional").addEventListener("change", function () {
+    aplicarFiltrosNacionais();
+});
+
+document.getElementById("dataFimNacional").addEventListener("change", function () {
+    aplicarFiltrosNacionais();
+});
+
+
+function limparFiltrosNacionais(){
+
+    document.getElementById("buscaNacional").value="";
+
+    document.getElementById("dataInicioNacional").value="";
+    document.getElementById("dataFimNacional").value="";
+
+    document
+        .querySelectorAll(
+            "#fornecedorNacionalBox input[type=checkbox]"
+        )
+        .forEach(x=>x.checked=true);
+
+    document
+        .querySelectorAll(
+            "#familiaNacionalBox input[type=checkbox]"
+        )
+        .forEach(x=>x.checked=true);
+
+    document
+        .querySelectorAll(
+            "#urgenciaNacionalBox input[type=checkbox]"
+        )
+        .forEach(x=>x.checked=true);
+
+    aplicarFiltrosNacionais();
+
+}
+
 
 
 
@@ -475,5 +843,85 @@ const blob = new Blob(
     link.click();
 }
 
+
+
+
+function mostrarImportados(){
+
+    document.getElementById("areaImportados").style.display = "block";
+    document.getElementById("areaNacionais").style.display = "none";
+
+}
+
+function mostrarNacionais(){
+
+    document.getElementById("areaImportados").style.display = "none";
+    document.getElementById("areaNacionais").style.display = "block";
+
+    aplicarFiltrosNacionais();
+
+}
+
+
+function exportarNacional(){
+
+    const linhas = document.querySelectorAll("#tabelaNacional tbody tr");
+
+    let csv = [];
+
+    // Cabeçalho
+    csv.push([
+        "Fornecedor",
+        "Código",
+        "Descrição",
+        "Família",
+        "Urgência",
+        "Quantidade",
+        "Prev. Chegada CD"
+    ].join(";"));
+
+    linhas.forEach(linha=>{
+
+        const colunas = linha.querySelectorAll("td");
+
+        let dados = [];
+
+        colunas.forEach(td=>{
+
+            let texto = td.innerText
+                .replace(/;/g,",")
+                .replace(/\n/g," ");
+
+            dados.push('"' + texto + '"');
+
+        });
+
+        csv.push(dados.join(";"));
+
+    });
+
+    const blob = new Blob(
+        ["\ufeff" + csv.join("\n")],
+        {
+            type:"text/csv;charset=utf-8;"
+        }
+    );
+
+    const link = document.createElement("a");
+
+    link.href = URL.createObjectURL(blob);
+
+    const hoje = new Date();
+
+    const data =
+        hoje.toLocaleDateString("pt-BR")
+            .replace(/\//g,"-");
+
+    link.download =
+        `Resumo_Nacional_${data}.csv`;
+
+    link.click();
+
+}
 
 

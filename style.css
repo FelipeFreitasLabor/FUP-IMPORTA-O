@@ -284,3 +284,70 @@ tr:hover{
 }
 
 
+
+
+
+
+.abas{
+    display:flex;
+    gap:10px;
+    margin-bottom:20px;
+}
+
+.aba-btn{
+    background:#1e293b;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+.aba-btn:hover{
+    background:#334155;
+}
+
+
+
+.pesquisaFiltro{
+
+    width:95%;
+    padding:8px;
+    margin-bottom:8px;
+
+    border:1px solid #ddd;
+    border-radius:6px;
+
+}
+
+.acoesFiltro{
+
+    display:flex;
+    gap:5px;
+    margin-bottom:8px;
+
+}
+
+.acoesFiltro button{
+
+    flex:1;
+
+    padding:6px;
+
+    border:none;
+
+    border-radius:5px;
+
+    cursor:pointer;
+
+    background:#0f766e;
+    color:white;
+
+}
+
+.acoesFiltro button:hover{
+
+    background:#115e59;
+
+}
+
